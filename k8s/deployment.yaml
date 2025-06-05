@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: visits-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: visits-api
+  template:
+    metadata:
+      labels:
+        app: visits-api
+    spec:
+      containers:
+        - name: visits-api
+          image: 716290576003.dkr.ecr.eu-central-1.amazonaws.com/visits-api:latest
+          ports:
+            - containerPort: 80
