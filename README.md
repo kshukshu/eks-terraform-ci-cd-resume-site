@@ -1,5 +1,12 @@
 # ☁️ Cloud Resume API on AWS EKS
 
+![Terraform](https://img.shields.io/badge/IaC-Terraform-blueviolet)
+![Kubernetes](https://img.shields.io/badge/Orchestration-Kubernetes-blue)
+![AWS](https://img.shields.io/badge/Cloud-AWS-orange)
+![FastAPI](https://img.shields.io/badge/Backend-FastAPI-green)
+![CI/CD](https://img.shields.io/badge/CI/CD-GitHub%20Actions-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 🌐 **Live version**: _Not publicly hosted (cost-optimized demo only)_  
 🧪 **Tested on**: macOS Sonoma 14.x, Terraform v1.6.6, kubectl v1.29, AWS CLI v2  
 
