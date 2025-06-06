@@ -12,6 +12,7 @@
 ## 📝 About This Project
 
 This project is a personal resume site deployed on Amazon EKS and provisioned with Terraform. It showcases my hands-on experience with Kubernetes, GitHub Actions-based CI/CD, and infrastructure-as-code best practices.
+This project was created to demonstrate my ability to independently design, deploy, and operate secure, scalable cloud infrastructure.
 
 ---
 
