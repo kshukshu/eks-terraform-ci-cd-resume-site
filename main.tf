@@ -97,6 +97,16 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_ec2_full" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
 }
 
+resource "aws_iam_role_policy_attachment" "cloudwatch_agent_policy" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_core" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 resource "aws_iam_role" "eks_node" {
   name = "eks-node-role"
 
@@ -127,6 +137,34 @@ resource "aws_iam_role_policy_attachment" "ec2_readonly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
+resource "aws_iam_role_policy" "cloudwatch_logs_write" {
+  name = "cwagent-logs-write"
+  role = aws_iam_role.eks_node.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams"
+        ],
+        Resource = "arn:aws:logs:eu-central-1:*:*"
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_agent_logs" {
+  role       = aws_iam_role.cloudwatch_agent.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+
 
 # VPC
 module "vpc" {
@@ -149,4 +187,29 @@ module "vpc" {
   tags = {
     "Project" = "cloud-resume"
   }
+}
+
+# VPC Endpoint
+resource "aws_vpc_endpoint" "ssm" {
+  vpc_id            = module.vpc.vpc_id
+  service_name      = "com.amazonaws.eu-central-1.ssm"
+  vpc_endpoint_type = "Interface"
+  subnet_ids        = module.vpc.public_subnets
+  security_group_ids = [module.vpc.default_security_group_id]
+}
+
+resource "aws_vpc_endpoint" "ssmmessages" {
+  vpc_id            = module.vpc.vpc_id
+  service_name      = "com.amazonaws.eu-central-1.ssmmessages"
+  vpc_endpoint_type = "Interface"
+  subnet_ids        = module.vpc.public_subnets
+  security_group_ids = [module.vpc.default_security_group_id]
+}
+
+resource "aws_vpc_endpoint" "ec2messages" {
+  vpc_id            = module.vpc.vpc_id
+  service_name      = "com.amazonaws.eu-central-1.ec2messages"
+  vpc_endpoint_type = "Interface"
+  subnet_ids        = module.vpc.public_subnets
+  security_group_ids = [module.vpc.default_security_group_id]
 }

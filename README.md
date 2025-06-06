@@ -1,7 +1,6 @@
-
 # ☁️ Cloud Resume API on AWS EKS
 
-This project is a cloud-native deployment of a simple `/visits` API using AWS infrastructure, Kubernetes, and Terraform. It is part of a hands-on DevOps portfolio.
+This project is a cloud-native deployment of a simple `/visits` API using AWS infrastructure, Kubernetes, Terraform, and GitHub Actions. It is part of a hands-on DevOps portfolio.
 
 ---
 
@@ -12,7 +11,8 @@ This project is a cloud-native deployment of a simple `/visits` API using AWS in
 ✅ Deployed on EKS with LoadBalancer access  
 ✅ Accessible via public ALB DNS  
 ✅ Cost-optimized: ALB removed, EC2 nodes scaled to 0  
-🔜 Next: GitHub Actions for CI/CD automation
+✅ CI/CD automated via GitHub Actions (kubectl apply on push to main)  
+🔜 Next: Add monitoring with CloudWatch
 
 ---
 
@@ -21,16 +21,20 @@ This project is a cloud-native deployment of a simple `/visits` API using AWS in
 ```
 
 .
-├── main.tf                 # Main Terraform infrastructure definitions
-├── variables.tf            # Variable definitions
-├── outputs.tf              # Output values (e.g., access keys, subnet IDs)
-├── provider.tf             # AWS provider configuration
-├── aws\_auth.tf             # EKS aws-auth ConfigMap setup
+├── main.tf                 # Terraform: IAM, EKS cluster, node group
+├── variables.tf            # Terraform: reusable variables
+├── outputs.tf              # Terraform: outputs (e.g., keys, cluster name)
+├── provider.tf             # Terraform: AWS provider config
+├── aws\_auth.tf             # Terraform: EKS aws-auth ConfigMap
 ├── k8s/
-│   ├── deployment.yaml     # Kubernetes Deployment for visits-api
-│   └── service.yaml        # Kubernetes Service (LoadBalancer)
+│   ├── deployment.yaml     # K8s Deployment for visits-api
+│   └── service.yaml        # K8s LoadBalancer Service
+├── app/
+│   ├── main.py             # FastAPI app
+│   └── Dockerfile          # Container config
 └── .github/
-└── workflows/          # (To be added in Phase 4)
+└── workflows/
+└── deploy.yml      # GitHub Actions workflow for CI/CD
 
 ````
 
@@ -42,20 +46,42 @@ This project is a cloud-native deployment of a simple `/visits` API using AWS in
 - **Method:** `GET`
 - **Response Example:**
 
-```json
+
 {
   "count": 123
 }
-````
+
 
 ---
 
 ## ☸️ Kubernetes Deployment
 
 * **Cluster:** AWS EKS (`resume-eks-cluster`)
-* **Node Group:** t3.small (scalable via Terraform)
-* **Ingress:** AWS Load Balancer (ALB)
+* **Node Group:** t3.small (1 node, scalable)
+* **Ingress:** AWS Load Balancer (ALB, deleted for cost savings)
 * **Container Registry:** Amazon ECR
+
+---
+
+## 🔁 CI/CD with GitHub Actions
+
+CI/CD is handled via a GitHub Actions workflow (`.github/workflows/deploy.yml`) that runs on every push to the `main` branch.
+
+### ✅ Workflow Steps
+
+1. Checkout source code
+2. Configure AWS credentials using GitHub Secrets
+3. Load `kubeconfig` from Secrets and apply Kubernetes manifests
+
+### 🔐 GitHub Secrets Required
+
+| Name                    | Description                                 |
+| ----------------------- | ------------------------------------------- |
+| `AWS_ACCESS_KEY_ID`     | Access key for `infra-admin` IAM user       |
+| `AWS_SECRET_ACCESS_KEY` | Secret key for `infra-admin`                |
+| `KUBECONFIG_DATA`       | Base64-encoded kubeconfig (no `exec` block) |
+
+> `kubeconfig` must not contain `AWS_PROFILE` or `exec` block. Authentication is handled via `aws-actions/configure-aws-credentials`.
 
 ---
 
@@ -63,49 +89,51 @@ This project is a cloud-native deployment of a simple `/visits` API using AWS in
 
 Last successful test:
 
-```bash
+
 curl http://<alb-dns-name>/visits
 # Output: {"count":123}
-```
 
-> ✅ ALB removed for cost savings. Re-create with `kubectl apply -f k8s/service.yaml`.
+
+> ✅ ALB removed for cost savings. Recreate with:
+
+
+kubectl apply -f k8s/service.yaml
+
 
 ---
 
 ## 📉 Cost Control Notes
 
-* Node group currently scaled to 0 (`terraform apply` with desired\_size=0)
-* ALB deleted (`kubectl delete svc visits-api-service`)
-* No running EC2 instances = minimal hourly charges
-* EKS base fee applies (approx. \$30/month)
+* Node group scaled to 0: `desired_size = 0`
+* ALB deleted with: `kubectl delete svc visits-api-service`
+* No running EC2 = minimal hourly costs
+* EKS base fee applies (\~\$30/month)
 
 ---
 
-## 📆 Next Steps (Phase 4 – CI/CD)
+## 🛠️ Operational Challenges & Fixes
 
-* Create GitHub Actions workflow:
+| Issue                                    | Resolution                                                                        |
+| ---------------------------------------- | --------------------------------------------------------------------------------- |
+| `Too many pods` on t3.micro              | Switched to `t3.small`                                                            |
+| `InvalidRequestException` for node group | `terraform taint` + re-apply                                                      |
+| `kubectl apply` fails in GitHub Actions  | Removed `exec` & `AWS_PROFILE` from kubeconfig; added AWS credentials via Secrets |
 
-  * Docker build & push to ECR
-  * `kubectl apply` via GitHub
-* Configure Secrets:
+These reflect real-world troubleshooting scenarios and reinforce IaC best practices.
 
-  * AWS\_ACCESS\_KEY\_ID / SECRET
-  * Kubeconfig or OIDC-based credentials
+---
+
+## 📆 Next Steps
+
+**Phase 5 – Monitoring & Observability**
+
+* Enable CloudWatch Container Insights
+* Capture logs & metrics from pods
+* Optional: set alarms or use Lambda triggers
 
 ---
 
 ## 📘 Author
 
-Built by [Shuhei Kato](https://github.com/katoshuhei) as part of a hands-on cloud engineering challenge.
-
-```
-
----
-
-必要に応じて：
-- `API仕様や画像（draw.ioのアーキテクチャ図）`
-- `参考リンク`
-- `学びや気づきのまとめ`
-
-なども追記できます。調整したいポイントがあれば教えてください！
-```
+Built by [Shuhei Kato](https://github.com/katoshuhei)
+As part of a hands-on cloud engineering challenge and portfolio.
