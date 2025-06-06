@@ -1,4 +1,7 @@
-# IAM
+##############################
+# IAM User: infra-admin
+##############################
+
 resource "aws_iam_user" "infra_admin" {
   name = "infra-admin"
 }
@@ -11,6 +14,11 @@ resource "aws_iam_user_policy_attachment" "infra_admin_attach" {
 resource "aws_iam_access_key" "infra_admin_key" {
   user = aws_iam_user.infra_admin.name
 }
+
+
+##############################
+# IAM Role: infra-admin-role
+##############################
 
 resource "aws_iam_role" "infra_admin_role" {
   name = "infra-admin-role"
@@ -26,6 +34,11 @@ resource "aws_iam_role" "infra_admin_role" {
     }]
   })
 }
+
+
+##############################
+# IAM Role: eks-cluster-role
+##############################
 
 resource "aws_iam_role" "eks_cluster" {
   name = "eks-cluster-role"
@@ -52,25 +65,20 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_ec2_readonly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "eks_cluster_elb_full" {
-  role       = aws_iam_role.eks_cluster.name
-  policy_arn = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"
-}
-
 resource "aws_iam_role_policy_attachment" "eks_cluster_ec2_full" {
   role       = aws_iam_role.eks_cluster.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "cloudwatch_agent_policy" {
-  role       = aws_iam_role.eks_node.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+resource "aws_iam_role_policy_attachment" "eks_cluster_elb_full" {
+  role       = aws_iam_role.eks_cluster.name
+  policy_arn = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "ssm_core" {
-  role       = aws_iam_role.eks_node.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
+
+##############################
+# IAM Role: eks-node-role
+##############################
 
 resource "aws_iam_role" "eks_node" {
   name = "eks-node-role"
@@ -102,6 +110,16 @@ resource "aws_iam_role_policy_attachment" "ec2_readonly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
+resource "aws_iam_role_policy_attachment" "cloudwatch_agent_policy" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_core" {
+  role       = aws_iam_role.eks_node.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 resource "aws_iam_role_policy" "cloudwatch_logs_write" {
   name = "cwagent-logs-write"
   role = aws_iam_role.eks_node.name
@@ -124,11 +142,9 @@ resource "aws_iam_role_policy" "cloudwatch_logs_write" {
 }
 
 
-resource "aws_iam_role_policy_attachment" "cloudwatch_agent_logs" {
-  role       = aws_iam_role.cloudwatch_agent.name
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-}
-
+##############################
+# IAM Role: cloudwatch-agent
+##############################
 
 resource "aws_iam_role" "cloudwatch_agent" {
   name = "EKSCloudWatchAgentRole"
@@ -148,6 +164,11 @@ resource "aws_iam_role" "cloudwatch_agent" {
       }
     }]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "cloudwatch_agent_logs" {
+  role       = aws_iam_role.cloudwatch_agent.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
 resource "aws_iam_role_policy_attachment" "cwagent_policy" {
