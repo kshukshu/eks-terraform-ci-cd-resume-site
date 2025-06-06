@@ -1,6 +1,10 @@
 # ☁️ Cloud Resume API on AWS EKS
 
-This project showcases a production-grade deployment pipeline for a simple `/visits` API using AWS infrastructure, Kubernetes, Terraform, and GitHub Actions. It is designed as a DevOps portfolio artifact to demonstrate hands-on experience with modern cloud-native infrastructure.
+🌐 **Live version**: _Not publicly hosted (cost-optimized demo only)_  
+🧪 **Tested on**: macOS Sonoma 14.x, Terraform v1.6.6, kubectl v1.29, AWS CLI v2  
+
+This project showcases a production-grade deployment pipeline for a simple `/visits` API using AWS infrastructure, Kubernetes, Terraform, and GitHub Actions.
+
 
 ---
 
@@ -18,7 +22,7 @@ This system is not hosted publicly for cost reasons. Instead, it serves as a tec
 
 ## 🖼️ Architecture Overview
 
-![Architecture Diagram](./cloud-resume-architecture.drawio.svg)
+![Architecture Diagram](./images/cloud-resume-architecture.drawio.svg)
 
 > This diagram outlines a fully containerized application deployed on EKS, managed via GitHub Actions and monitored through CloudWatch using IAM Roles for Service Accounts (IRSA).
 
