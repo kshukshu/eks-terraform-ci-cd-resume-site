@@ -37,13 +37,20 @@ D --> E[Update Deployment on EKS]
 ```
 
 ---
-
 ## 🔍 Design Decisions & Notes
-No WAF/ALB: This project focuses on EKS and CI/CD workflows. WAF or managed load balancers are intentionally excluded to simplify cost and focus on core infrastructure.
 
-OIDC + IRSA: IAM Roles for Service Accounts are used for secure access to AWS resources within pods.
+🔹 **Load Balancer Choice**:  
+This project uses an Application Load Balancer (ALB) as an ingress point to EKS, following AWS best practices for exposing services securely and scalably. However, additional components like AWS WAF are intentionally omitted to simplify the architecture and reduce cost for a personal project setting.
 
-Security Scoping: While not implemented here, further security hardening (like KMS encryption or Network Policies) would be planned in a production-grade system.
+🔹 **OIDC + IRSA**:  
+IAM Roles for Service Accounts are used to grant fine-grained and secure access to AWS services from within Kubernetes pods, avoiding the use of node-level IAM policies.
+
+🔹 **Security Scoping**:  
+While not implemented in this prototype, a production-grade system would include additional hardening such as:  
+- Data encryption using AWS KMS  
+- Network Policies to restrict pod-to-pod traffic  
+- Container image vulnerability scanning (e.g. Amazon Inspector or Trivy)  
+- Centralized logging with CloudWatch Logs Insights or OpenSearch
 
 ---
 
