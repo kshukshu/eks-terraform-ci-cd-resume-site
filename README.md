@@ -4,6 +4,12 @@ This project is a cloud-native deployment of a simple `/visits` API using AWS in
 
 ---
 
+## 🖼️ Architecture Diagram
+
+![cloud-resume-architecture.drawio](./cloud-resume-architecture.drawio)
+
+---
+
 ## 🚀 Current Status
 
 ✅ Infrastructure built with Terraform  
