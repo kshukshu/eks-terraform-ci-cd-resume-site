@@ -1,3 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+env/
+venv/
+
+# Docker
+*.log
+*.out
+
 # Terraform
 .terraform/
 terraform.tfstate
@@ -5,3 +19,12 @@ terraform.tfstate.backup
 *.tfvars
 *.tfvars.json
 .crc
+
+# VSCode
+.vscode/
+
+# Mac
+.DS_Store
+
+# kubeconfig for CI
+ci-kubeconfig
