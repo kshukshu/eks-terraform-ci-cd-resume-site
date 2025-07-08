@@ -1,4 +1,5 @@
-# Cloud Resume on EKS
+
+# EKS‑Terraform‑CI‑CD Resume Site 🚀📝
 
 ![Terraform](https://img.shields.io/badge/IaC-Terraform-blueviolet)
 ![Kubernetes](https://img.shields.io/badge/Orchestration-Kubernetes-blue)
